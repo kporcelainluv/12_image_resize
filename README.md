@@ -20,10 +20,11 @@ The program takes such arguments:
 ```
 Picture name must be the last input argument
 
+# Example input
+
 ```
 $ python image_resize.py arg1 arg2 arg3 picture_name
 ```
-# Example input
 
 ```
 $ python image_resize.py --height 500 --width 400 --output /Users/Ksusha/Desktop/programming/devman/12_image_resize/folder diagram.png
