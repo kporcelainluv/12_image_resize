@@ -49,12 +49,7 @@ def make_new_picname(picname, height, width):
     dot = picname.rfind(".")
     return "{}_{}x{}{}".format(picname[:dot], height, width, picname[dot:])
 
-
-if __name__ == '__main__':
-    (picname, args_dict) = argument_parser()
-
-    picture = Image.open(picname)
-    actual_width, actual_height = picture.size
+def make_new_picture(picname, args_dict, picture):
     width = args_dict["width"] and args_dict["width"][0]
     height = args_dict["height"] and args_dict["height"][0]
     scale = args_dict["scale"] and args_dict["scale"][0]
@@ -79,7 +74,14 @@ if __name__ == '__main__':
 
     new_picname = make_new_picname(picname, height, width)
     if output is not None:
-        picture.save(os.path.join(output, new_picname))
+        return picture.save(os.path.join(output, new_picname))
     else:
         dir_path = os.path.dirname(os.path.realpath(picname))
-        picture.save(os.path.join(dir_path, new_picname))
+        return picture.save(os.path.join(dir_path, new_picname))
+
+
+
+if __name__ == '__main__':
+    (picname, args_dict) = argument_parser()
+    picture = Image.open(picname)
+    make_new_picture(picname, args_dict, picture)
