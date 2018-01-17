@@ -8,11 +8,13 @@ def resize_image(image, width, height):
 
 
 def count_width(actual_width, actual_height, new_height):
-    return (new_height * actual_width) // actual_height
+    width = (new_height * actual_width) // actual_height
+    return width
 
 
 def count_height(actual_width, actual_height, new_width):
-    return (new_width * actual_height) // actual_width
+    height = (new_width * actual_height) // actual_width
+    return height
 
 
 def get_scale(scale_number, image, actual_height, actual_width):
