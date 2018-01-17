@@ -3,85 +3,80 @@ import os
 import argparse
 
 
-def resize_the_pic(picture_name, width, height):
-    return picture_name.resize((width, height))
+def resize_image(image, width, height):
+    return image.resize((width, height))
 
 
 def count_width(actual_width, actual_height, new_height):
-    return int(new_height * actual_width) // actual_height
+    return (new_height * actual_width) // actual_height
 
 
 def count_height(actual_width, actual_height, new_width):
-    return int(new_width * actual_height) // actual_width
+    return (new_width * actual_height) // actual_width
 
 
-def get_scale(scale_number, pic_name, actual_height, actual_width):
+def get_scale(scale_number, image, actual_height, actual_width):
     new_height = round(scale_number * actual_height)
     new_width = round(scale_number * actual_width)
-    return resize_the_pic(pic_name, new_width, new_height)
+    return resize_image(image, new_width, new_height)
 
 
-def argument_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--scale",
-                        type=int,
-                        action='store',
-                        nargs=1)
-    parser.add_argument("--height",
-                        type=int,
-                        action='store',
-                        nargs=1)
-    parser.add_argument("--width",
-                        type=int,
-                        action='store',
-                        nargs=1)
-    parser.add_argument("--output",
-                        type=str,
-                        action='store',
-                        nargs=1)
-
-    args = parser.parse_known_args()
-    picname, args_dict = args[-1][0], vars(args[0])
-    return picname, args_dict
+def make_new_imgname(image, height, width):
+    filename, extension = os.path.splitext(image)
+    return "{}_{}x{}{}".format(filename, height, width, extension)
 
 
-def make_new_picname(picname, height, width):
-    dot = picname.rfind(".")
-    return "{}_{}x{}{}".format(picname[:dot], height, width, picname[dot:])
+def count_height_and_width(image):
+    width, height = image.size
+    return width, height
 
-def make_new_picture(picname, args_dict, picture):
-    width = args_dict["width"] and args_dict["width"][0]
-    height = args_dict["height"] and args_dict["height"][0]
-    scale = args_dict["scale"] and args_dict["scale"][0]
-    output = args_dict["output"] and args_dict["output"][0]
 
-    if scale is not None and (height is not None or width is not None):
+def make_new_picture(image, args):
+    width, height = args.width, args.height
+    actual_width, actual_height = count_height_and_width(image)
+
+    if all([args.scale, any([height, width])]):
         print("Enter either scale or height and width")
         raise SystemExit
 
-    if scale is not None:
-        picture = get_scale(scale, picture, actual_height, actual_width)
-        height, width = actual_height, actual_width
+    if args.scale:
+        new_image = get_scale(args.scale, image, actual_height, actual_width)
 
     else:
-        if height is None and width is not None:
+        if height is None:
             height = count_height(actual_width, actual_height, width)
 
-        elif width is None and height is not None:
+        elif width is None:
             width = count_width(actual_width, actual_height, height)
 
-        picture = resize_the_pic(picture, width, height)
+        new_image = resize_image(image, width, height)
+    return new_image
 
-    new_picname = make_new_picname(picname, height, width)
-    if output is not None:
-        return picture.save(os.path.join(output, new_picname))
+
+def save_the_image(image, args):
+    new_image = make_new_picture(image, args)
+    width, height = new_image.size
+    new_imgname = make_new_imgname(args.input, height, width)
+    if args.output:
+        new_image.save(os.path.join(args.output, new_imgname))
     else:
-        dir_path = os.path.dirname(os.path.realpath(picname))
-        return picture.save(os.path.join(dir_path, new_picname))
+        dir_path = os.path.dirname(os.path.realpath(args.input))
+        new_image.save(os.path.join(dir_path, new_imgname))
 
+
+def define_command_line_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--scale", type=float)
+    parser.add_argument("--height", type=int)
+    parser.add_argument("--width", type=int)
+    parser.add_argument("--output", type=str)
+    parser.add_argument("--input")
+    return parser.parse_args()
 
 
 if __name__ == '__main__':
-    (picname, args_dict) = argument_parser()
-    picture = Image.open(picname)
-    make_new_picture(picname, args_dict, picture)
+    args = define_command_line_args()
+    if args.input is None:
+        print("Please enter your png/jpeg file")
+    input_image = Image.open(args.input)
+    save_the_image(input_image, args)
