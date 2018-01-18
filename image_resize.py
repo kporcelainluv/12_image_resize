@@ -17,32 +17,26 @@ def count_height(actual_width, actual_height, new_width):
     return height
 
 
-def get_scale(scale_number, image, actual_height, actual_width):
+def resize_img_by_scale(scale_number, image, actual_height, actual_width):
     new_height = round(scale_number * actual_height)
     new_width = round(scale_number * actual_width)
     return resize_image(image, new_width, new_height)
 
 
-def make_new_imgname(image, height, width):
-    filename, extension = os.path.splitext(image)
+def make_new_imgname(img_name, height, width):
+    filename, extension = os.path.splitext(img_name)
     return "{}_{}x{}{}".format(filename, height, width, extension)
 
 
-def count_height_and_width(image):
-    width, height = image.size
-    return width, height
-
-
-def make_new_picture(image, args):
+def check_params_and_resize(image, args):
     width, height = args.width, args.height
-    actual_width, actual_height = count_height_and_width(image)
+    actual_width, actual_height = image.size
 
     if all([args.scale, any([height, width])]):
-        print("Enter either scale or height and width")
-        raise SystemExit
+        exit("Enter either scale or height and width")
 
     if args.scale:
-        new_image = get_scale(args.scale, image, actual_height, actual_width)
+        new_image = resize_img_by_scale(args.scale, image, actual_height, actual_width)
 
     else:
         if height is None:
@@ -55,15 +49,12 @@ def make_new_picture(image, args):
     return new_image
 
 
-def save_the_image(image, args):
-    new_image = make_new_picture(image, args)
-    width, height = new_image.size
-    new_imgname = make_new_imgname(args.input, height, width)
+def save_the_image(image, args, new_imgname):
     if args.output:
-        new_image.save(os.path.join(args.output, new_imgname))
+        image.save(os.path.join(args.output, new_imgname))
     else:
         dir_path = os.path.dirname(os.path.realpath(args.input))
-        new_image.save(os.path.join(dir_path, new_imgname))
+        image.save(os.path.join(dir_path, new_imgname))
 
 
 def define_command_line_args():
@@ -81,4 +72,7 @@ if __name__ == '__main__':
     if args.input is None:
         print("Please enter your png/jpeg file")
     input_image = Image.open(args.input)
-    save_the_image(input_image, args)
+    new_image = check_params_and_resize(input_image, args)
+    width, height = new_image.size
+    new_imgname = make_new_imgname(args.input, height, width)
+    save_the_image(input_image, args, new_imgname)
