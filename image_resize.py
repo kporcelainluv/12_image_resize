@@ -16,7 +16,7 @@ def count_height(actual_width, actual_height, new_width):
 def height_and_width_by_scale(scale_number, actual_width, actual_height):
     new_height = round(scale_number * actual_height)
     new_width = round(scale_number * actual_width)
-    return (new_width, new_height)
+    return new_width, new_height
 
 
 def make_new_imgname(img_name, height, width):
