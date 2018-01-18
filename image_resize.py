@@ -3,10 +3,6 @@ import os
 import argparse
 
 
-def resize_image(image, width, height):
-    return image.resize((width, height))
-
-
 def count_width(actual_width, actual_height, new_height):
     width = (new_height * actual_width) // actual_height
     return width
@@ -17,10 +13,10 @@ def count_height(actual_width, actual_height, new_width):
     return height
 
 
-def resize_img_by_scale(scale_number, image, actual_height, actual_width):
+def height_and_width_by_scale(scale_number, actual_width, actual_height):
     new_height = round(scale_number * actual_height)
     new_width = round(scale_number * actual_width)
-    return resize_image(image, new_width, new_height)
+    return (new_width, new_height)
 
 
 def make_new_imgname(img_name, height, width):
@@ -28,7 +24,7 @@ def make_new_imgname(img_name, height, width):
     return "{}_{}x{}{}".format(filename, height, width, extension)
 
 
-def check_params_and_resize(image, args):
+def check_params(image, args):
     width, height = args.width, args.height
     actual_width, actual_height = image.size
 
@@ -36,7 +32,7 @@ def check_params_and_resize(image, args):
         return None
 
     if args.scale:
-        new_image = resize_img_by_scale(args.scale, image, actual_height, actual_width)
+        return height_and_width_by_scale(args.scale, actual_width, actual_height)
 
     else:
         if height is None:
@@ -45,17 +41,20 @@ def check_params_and_resize(image, args):
         elif width is None:
             width = count_width(actual_width, actual_height, height)
 
-        new_image = resize_image(image, width, height)
-    return new_image
+        return width, height
+
+
+def resize_image(image, width, height):
+    return image.resize((width, height))
 
 
 def save_the_image(image, args, new_imgname):
     if args.output:
-        image.save(os.path.join(args.output, new_imgname))
+        new_image_path = (os.path.join(args.output, new_imgname))
     else:
         dir_path = os.path.dirname(os.path.realpath(args.input))
-        image.save(os.path.join(dir_path, new_imgname))
-
+        new_image_path = (os.path.join(dir_path, new_imgname))
+    image.save(new_image_path)
 
 def define_command_line_args():
     parser = argparse.ArgumentParser()
@@ -63,19 +62,17 @@ def define_command_line_args():
     parser.add_argument("--height", type=int)
     parser.add_argument("--width", type=int)
     parser.add_argument("--output", type=str)
-    parser.add_argument("--input")
+    parser.add_argument("--input", required=True)
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = define_command_line_args()
-    if args.input is None:
-        print("Please enter your png/jpeg file")
     input_image = Image.open(args.input)
-    new_image = check_params_and_resize(input_image, args)
+    new_width, new_height = check_params(input_image, args)
+    new_image = resize_image(input_image, new_width, new_height)
     if new_image is None:
         print("Enter either scale or height and width")
     else:
-        width, height = new_image.size
-        new_imgname = make_new_imgname(args.input, height, width)
+        new_imgname = make_new_imgname(args.input, new_height, new_width)
         save_the_image(input_image, args, new_imgname)
