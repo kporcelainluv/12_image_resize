@@ -33,7 +33,7 @@ def check_params_and_resize(image, args):
     actual_width, actual_height = image.size
 
     if all([args.scale, any([height, width])]):
-        exit("Enter either scale or height and width")
+        return None
 
     if args.scale:
         new_image = resize_img_by_scale(args.scale, image, actual_height, actual_width)
@@ -73,6 +73,9 @@ if __name__ == '__main__':
         print("Please enter your png/jpeg file")
     input_image = Image.open(args.input)
     new_image = check_params_and_resize(input_image, args)
-    width, height = new_image.size
-    new_imgname = make_new_imgname(args.input, height, width)
-    save_the_image(input_image, args, new_imgname)
+    if new_image is None:
+        print("Enter either scale or height and width")
+    else:
+        width, height = new_image.size
+        new_imgname = make_new_imgname(args.input, height, width)
+        save_the_image(input_image, args, new_imgname)
