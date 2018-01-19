@@ -29,12 +29,12 @@ def check_params(image, args):
     actual_width, actual_height = image.size
 
     if all([args.scale, any([height, width])]):
-        return None
+        exit("Enter either scale or height and width")
 
     if args.scale:
         return height_and_width_by_scale(args.scale, actual_width, actual_height)
 
-    else:
+    if any([height, width]):
         if height is None:
             height = count_height(actual_width, actual_height, width)
 
@@ -42,6 +42,8 @@ def check_params(image, args):
             width = count_width(actual_width, actual_height, height)
 
         return width, height
+    else:
+        exit("Enter valid height, width or scale")
 
 
 def resize_image(image, width, height):
@@ -71,8 +73,5 @@ if __name__ == '__main__':
     input_image = Image.open(args.input)
     new_width, new_height = check_params(input_image, args)
     new_image = resize_image(input_image, new_width, new_height)
-    if new_image is None:
-        print("Enter either scale or height and width")
-    else:
-        new_imgname = make_new_imgname(args.input, new_height, new_width)
-        save_the_image(input_image, args, new_imgname)
+    new_imgname = make_new_imgname(args.input, new_height, new_width)
+    save_the_image(input_image, args, new_imgname)
