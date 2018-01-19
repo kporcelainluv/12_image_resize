@@ -29,7 +29,7 @@ def check_params(image, args):
     actual_width, actual_height = image.size
 
     if all([args.scale, any([height, width])]):
-        exit("Enter either scale or height and width")
+        raise SystemExit("Enter either scale or height and width")
 
     if args.scale:
         return height_and_width_by_scale(args.scale, actual_width, actual_height)
@@ -43,7 +43,7 @@ def check_params(image, args):
 
         return width, height
     else:
-        exit("Enter valid height, width or scale")
+        raise SystemExit("Enter valid height, width or scale")
 
 
 def resize_image(image, width, height):
