@@ -58,12 +58,12 @@ def resize_image(image, width, height):
     return image.resize((width, height))
 
 
-def save_the_image(image_name, image, output, input, new_width, new_height):
-    if output:
-        new_image_path = (os.path.join(output, image_name))
+def save_the_image(image_name, image, output_image, input_image, new_width, new_height):
+    if output_image:
+        new_image_path = (os.path.join(output_image, image_name))
     else:
-        dir_path = os.path.dirname(os.path.realpath(input))
-        new_imgname = make_new_imgname(input, new_width, new_height)
+        dir_path = os.path.dirname(os.path.realpath(input_image))
+        new_imgname = make_new_imgname(input_image, new_width, new_height)
         new_image_path = (os.path.join(dir_path, new_imgname))
     image.save(new_image_path)
 
