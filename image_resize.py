@@ -21,7 +21,7 @@ def count_height_and_width_by_scale(scale_number, actual_width, actual_height):
 
 def make_new_imgname(img_name, height, width):
     filename, extension = os.path.splitext(img_name)
-    return "{}_{}x{}{}".format(filename, height, width, extension)
+    return "{}__{}x{}{}".format(filename, height, width, extension)
 
 
 def check_params(args):
@@ -38,37 +38,30 @@ def count_height_and_width(actual_width, actual_height, height, width, scale):
     if scale:
         return count_height_and_width_by_scale(scale, actual_width, actual_height)
 
-    if all([height, width]):
-        print("Height and width are being read from input and are not adjusted to each other.")
-        return width, height
-
-    elif any([height, width]):
-        print("Your second parameter (either height or width) will be adjusted automatically.")
-
-        if height is None:
+    if height is None:
             height = count_height(actual_width, actual_height, width)
 
-        elif width is None:
+    elif width is None:
             width = count_width(actual_width, actual_height, height)
 
-        return width, height
+    return width, height
 
 
 def resize_image(image, width, height):
     return image.resize((width, height))
 
 
-def save_the_image(image_name, image, output_image, input_image, new_width, new_height):
-    if output_image:
-        new_image_path = (os.path.join(output_image, image_name))
+def save_the_image(image_name, resized_image, output_path, original_image, new_width, new_height):
+    if output_path:
+        new_image_path = (os.path.join(output_path, image_name))
     else:
-        dir_path = os.path.dirname(os.path.realpath(input_image))
-        new_imgname = make_new_imgname(input_image, new_width, new_height)
+        dir_path = os.path.dirname(os.path.realpath(original_image))
+        new_imgname = make_new_imgname(original_image, new_width, new_height)
         new_image_path = (os.path.join(dir_path, new_imgname))
-    image.save(new_image_path)
+    resized_image.save(new_image_path)
 
 
-def define_command_line_args():
+def parse_command_line_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--scale", type=float)
     parser.add_argument("--height", type=int)
@@ -79,15 +72,21 @@ def define_command_line_args():
 
 
 if __name__ == '__main__':
-    args = define_command_line_args()
+    args = parse_command_line_args()
     input_image = Image.open(args.input)
     actual_width, actual_height = input_image.size
     if check_params(args):
-        new_width, new_height = count_height_and_width(
-            actual_width,
-            actual_height,
-            args.height,
-            args.width,
-            args.scale)
+        if all([args.height, args.width]):
+            print("Height and width are being read from input and are not adjusted to each other.")
+            new_width, new_height = args.width, args.height
+
+        elif any([args.height, args.width]):
+            print("Your second parameter (either height or width) will be adjusted automatically.")
+            new_width, new_height = count_height_and_width(
+                actual_width,
+                actual_height,
+                args.height,
+                args.width,
+                args.scale)
         new_image = resize_image(input_image, new_width, new_height)
         save_the_image(args.input, input_image, args.output, args.input, new_width, new_height)
