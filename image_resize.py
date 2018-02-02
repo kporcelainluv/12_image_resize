@@ -13,7 +13,7 @@ def count_height(actual_width, actual_height, new_width):
     return height
 
 
-def count_h_and_w_by_scale(scale_number, actual_width, actual_height):
+def count_size_by_scale(scale_number, actual_width, actual_height):
     new_height = round(scale_number * actual_height)
     new_width = round(scale_number * actual_width)
     return new_width, new_height
@@ -48,38 +48,28 @@ def check_params(args):
     return True
 
 
-def save_the_image(image_name,
-                   resized_image,
-                   output_path,
-                   original_image,
-                   new_width,
-                   new_height):
+def save_the_image(
+        im_name, resized_image, output_path, original_im, new_w, new_h):
     if output_path:
-        new_image_path = (os.path.join(output_path, image_name))
+        new_image_path = (os.path.join(output_path, im_name))
     else:
-        new_image_path = make_new_imgname(original_image,
-                                          new_width,
-                                          new_height)
+        new_image_path = make_new_imgname(
+            original_im, new_w, new_h)
     resized_image.save(new_image_path)
 
 
 def parse_command_line_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--scale",
-                        type=float,
-                        help="height and width are adjusted to scale")
-    parser.add_argument("--height",
-                        type=int,
-                        help="height of the pic")
-    parser.add_argument("--width",
-                        type=int,
-                        help="width of the pic")
-    parser.add_argument("--output",
-                        type=str,
-                        help="path to catalog to save the pic")
-    parser.add_argument("--input",
-                        required=True,
-                        help="pic you want to resize")
+    parser.add_argument(
+        "--scale", type=float, help="height and width are adjusted to scale")
+    parser.add_argument(
+        "--height", type=int, help="height of the pic")
+    parser.add_argument(
+        "--width", type=int, help="width of the pic")
+    parser.add_argument(
+        "--output", type=str, help="path to catalog to save the pic")
+    parser.add_argument(
+        "--input", required=True, help="pic you want to resize")
     return parser.parse_args()
 
 
@@ -90,28 +80,21 @@ if __name__ == '__main__':
 
     if not check_params(args):
         exit()
-    else:
-        if args.scale:
-            new_width, new_height = count_h_and_w_by_scale(args.scale,
-                                                           actual_width,
-                                                           actual_height)
-            print("Height and width are adjusted to scale")
+    if args.scale:
+        new_width, new_height = count_size_by_scale(
+            args.scale, actual_width, actual_height)
+        print("Height and width are adjusted to scale")
 
-        elif any([args.height, args.width]):
-            print("Your second parameter is adjusted automatically")
-            new_width, new_height = count_height_and_width(actual_width,
-                                                           actual_height,
-                                                           args.height,
-                                                           args.width)
+    elif any([args.height, args.width]):
+        print("Your second parameter is adjusted automatically")
+        new_width, new_height = count_height_and_width(
+            actual_width, actual_height, args.height, args.width)
 
-        elif all([args.height, args.width]):
-            print("Height and width are read from input and are not adjusted")
-            new_width, new_height = args.width, args.height
+    elif all([args.height, args.width]):
+        print("Height and width are read from input and are not adjusted")
+        new_width, new_height = args.width, args.height
 
-        new_image = resize_image(input_image, new_width, new_height)
-        save_the_image(args.input,
-                       input_image,
-                       args.output,
-                       args.input,
-                       new_width,
-                       new_height)
+    new_image = resize_image(input_image, new_width, new_height)
+
+    save_the_image(
+        args.input, input_image, args.output, args.input, new_width, new_height)
