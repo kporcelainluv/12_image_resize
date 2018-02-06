@@ -1,8 +1,7 @@
 # Image Resizer
 
-The program resizes given picture by scale, height and width, or only by height or width (second argument is adjusted proportionally). 
-The program outputs picture in the same directory or outputs to input directory and adds the size of file to the name.
-(pic.jpg --> pic__200x400.jpg)
+The program resizes given picture by scale or height and width or only by height or width (second argument is adjusted proportionally). 
+The program outputs picture to the same directory (and adds picsize to the name, ex pic__200x400.jpg) or to output directory if given.
 
 # How it works
 
