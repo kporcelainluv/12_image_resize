@@ -49,20 +49,20 @@ def check_params(args):
 
 
 def save_the_image(
-        im_name,
+        image_name,
         resized_image,
         output_path,
-        original_im,
-        new_w,
-        new_h
+        image,
+        new_width,
+        new_heigth
 ):
     if output_path:
-        new_image_path = (os.path.join(output_path, im_name))
+        new_image_path = (os.path.join(output_path, image_name))
     else:
         new_image_path = make_new_imgname(
-            original_im,
-            new_w,
-            new_h
+            image,
+            new_width,
+            new_heigth
         )
     resized_image.save(new_image_path)
 
@@ -97,7 +97,7 @@ def parse_command_line_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_command_line_args()
     input_image = Image.open(args.input)
     actual_width, actual_height = input_image.size
